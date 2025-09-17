@@ -14,7 +14,14 @@ PHC2SYS=$(jq -r '.enable_phc2sys' "$CFG")
 
 [[ -f "$PTP_CONF" ]] || { echo "Missing $PTP_CONF"; exit 1; }
 
-# -2 only when using L2 frames
+# Detect gPTP (802.1AS) profile from the conf
+if grep -Eq '^[[:space:]]*gPTP[[:space:]]+1[[:space:]]*$' "$PTP_CONF"; then
+  GPTP_MODE=true
+else
+  GPTP_MODE=false
+fi
+
+# Transport flag (-2 for L2)
 L2FLAG=""
 if [[ "$L2" == "true" ]]; then
   L2FLAG="-2"
@@ -28,11 +35,11 @@ else
 fi
 
 echo "Starting ptp4l (MASTER) on $IFACE using $PTP_CONF ..."
+# For master, no need for -s; gPTP or 1588 both fine without it
 sudo ptp4l -f "$PTP_CONF" -i "$IFACE" $L2FLAG -m &
 
 if [[ "$PHC2SYS" == "true" ]]; then
   echo "Starting phc2sys (-a -rr) ..."
-  # -a auto-binds to ptp4l ports; -rr steers PHC<->SYS depending on GM role
   sudo phc2sys -a -rr -m &
 fi
 
