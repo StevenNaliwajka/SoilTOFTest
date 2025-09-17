@@ -1,8 +1,8 @@
 {
   "interface": "eth0",
   "domainNumber": 0,
-  "time_stamping": "hardware",   // "hardware" or "software"
-  "priority1": 10,               // lower = more likely to be master
-  "layer2": false,               // true -> use Layer-2 (add -2), false -> UDP/IP
-  "enable_phc2sys": true         // keep PHC<->system clock in sync
+  "time_stamping": "hardware",
+  "priority1": 10,
+  "layer2": false,
+  "enable_phc2sys": true
 }
